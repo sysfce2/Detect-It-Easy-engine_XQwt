@@ -4,6 +4,24 @@ include_directories(${CMAKE_CURRENT_LIST_DIR}/3rdparty/qwt/src/)
 add_definitions(-DXQWT_PRESENT)
 add_definitions(-DQWT_MOC_INCLUDE=1)
 
+if(NOT DEFINED XQWT_QT_MAJOR)
+    if(DEFINED QT_VERSION_MAJOR)
+        set(XQWT_QT_MAJOR ${QT_VERSION_MAJOR})
+    elseif(TARGET Qt6::Core OR TARGET Qt6::Widgets)
+        set(XQWT_QT_MAJOR 6)
+    elseif(TARGET Qt5::Core OR TARGET Qt5::Widgets)
+        set(XQWT_QT_MAJOR 5)
+    else()
+        find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
+        set(XQWT_QT_MAJOR ${QT_VERSION_MAJOR})
+    endif()
+endif()
+
+find_package(Qt${XQWT_QT_MAJOR} REQUIRED COMPONENTS PrintSupport)
+
+set(XQWT_LIBS ${XQWT_LIBS} Qt${XQWT_QT_MAJOR}::PrintSupport)
+link_libraries(Qt${XQWT_QT_MAJOR}::PrintSupport)
+
 set(XQWT_SOURCES
     ${XQWT_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/3rdparty/qwt/src/qwt.cpp
